@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+    Unit Converter
+</title>
+<link rel="stylesheet", href="/static/css/convert.css">
+</head>
+<body>
+<div class="converter">
+    <div class="converter__body">
+        <div class="converter__title">
+            <span style="text-transform: capitalize;">
+                {{.ConvertionType}}
+            </span> Converter
+        </div>
+        <div class="converter__list">
+            <div class="convertion-type">
+                <a href="/convert/length">length</a>
+            </div>
+            <div class="convertion-type">
+                <a href="/convert/weight">weight</a>
+            </div>
+            <div class="convertion-type">
+                <a href="/convert/temperature">temperature</a>
+            </div>
+        </div>
+        <div class="converter__result">
+            <div class="text">
+                Result of your calculations:
+            </div>
+            <div class="result">
+                {{.Result}}
+            </div>
+        </div>
+        <form action="/convert/{{.ConvertionType}}">
+            <div class="btn">
+                <button class="btn__element">Reset</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+    Unit Converter
+</title>
+<link rel="stylesheet", href="/static/css/convert.css">
+</head>
+<body>
+<div class="converter">
+    <div class="converter__body">
+        <div class="converter__title">
+            Weight Converter
+        </div>
+        <div class="converter__list">
+            <div class="convertion-type">
+                <a href="/convert/length">length</a>
+            </div>
+            <div class="convertion-type">
+                <a href="/convert/weight">weight</a>
+            </div>
+            <div class="convertion-type">
+                <a href="/convert/temperature">temperature</a>
+            </div>
+        </div>
+        <form action="/calculate/weight" method="POST">
+            <div class="converter__forms">
+                <div class="form">
+                    <div class="text">
+                        <label for="convertedValue">
+                            Enter the weight value to convert    
+                        </label>
+                    </div>
+                    <div class="input">
+                        <input name="value" type="text" id="convertedValue" class="input__choice" placeholder="Value">
+                    </div>
+                </div>
+                <div class="form">
+                    <div class="text">
+                        <label for="convertedType">
+                            Unit to convert from    
+                        </label>
+                    </div>
+                    <div class="input">
+                        <select name="converted" id="convertedType" class="input__choice">
+                            <option value="milligram">Milligram</option>
+                            <option value="gram">Gram</option>
+                            <option value="kilogram">Kilogram</option>
+                            <option value="ounce">Ounce</option>
+                            <option value="pound">Pound</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form">
+                    <div class="text">
+                        <label for="convertingType">
+                            Unit to convert to
+                        </label>
+                    </div>
+                    <div class="input">
+                        <select name="converting" id="convertingType" class="input__choice">
+                            <option value="milligram">Milligram</option>
+                            <option value="gram">Gram</option>
+                            <option value="kilogram">Kilogram</option>
+                            <option value="ounce">Ounce</option>
+                            <option value="pound">Pound</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="btn">
+                <button class="btn__element">Convert</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
