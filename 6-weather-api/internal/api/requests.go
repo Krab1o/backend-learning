@@ -1,4 +1,4 @@
-package handlers
+package api
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"weather-api/internal/data"
 )
 
-func weatherRequest(city string) *data.Response {
+func WeatherRequest(city string) *data.Response {
 	apikey := os.Getenv("API_KEY")
 	u, _ := url.Parse(data.UrlRequest + city)
 	quers := u.Query()

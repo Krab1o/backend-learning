@@ -26,7 +26,7 @@ type Response struct {
 		Precip         int      `json:"precip"`
 		Precipprob     int      `json:"precipprob"`
 		Precipcover    int      `json:"precipcover"`
-		Preciptype     any      `json:"preciptype"`
+		// Preciptype     any      `json:"preciptype"`
 		Snow           int      `json:"snow"`
 		Snowdepth      float64  `json:"snowdepth"`
 		Windgust       float64  `json:"windgust"`
@@ -60,7 +60,7 @@ type Response struct {
 			Precipprob       int       `json:"precipprob"`
 			Snow             int       `json:"snow"`
 			Snowdepth        float64   `json:"snowdepth"`
-			Preciptype       any       `json:"preciptype"`
+			// Preciptype       any       `json:"preciptype"`
 			Windgust         int       `json:"windgust"`
 			Windspeed        float64   `json:"windspeed"`
 			Winddir          float64   `json:"winddir"`
@@ -79,19 +79,19 @@ type Response struct {
 		} `json:"hours"`
 		DatetimeInstance time.Time `json:"datetimeInstance"`
 	} `json:"days"`
-	Alerts   []any `json:"alerts"`
-	// Stations struct {
-	// 	F0644 struct {
-	// 		Distance     int     `json:"distance"`
-	// 		Latitude     float64 `json:"latitude"`
-	// 		Longitude    float64 `json:"longitude"`
-	// 		UseCount     int     `json:"useCount"`
-	// 		ID           string  `json:"id"`
-	// 		Name         string  `json:"name"`
-	// 		Quality      int     `json:"quality"`
-	// 		Contribution int     `json:"contribution"`
-	// 	} `json:"F0644"`
-	// } `json:"stations"`
+	// Alerts   []any `json:"alerts"`
+	Stations struct {
+		F0644 struct {
+			Distance     int     `json:"distance"`
+			Latitude     float64 `json:"latitude"`
+			Longitude    float64 `json:"longitude"`
+			UseCount     int     `json:"useCount"`
+			ID           string  `json:"id"`
+			Name         string  `json:"name"`
+			Quality      int     `json:"quality"`
+			Contribution int     `json:"contribution"`
+		} `json:"F0644"`
+	} `json:"stations"`
 	CurrentConditions struct {
 		Datetime       string   `json:"datetime"`
 		DatetimeEpoch  int      `json:"datetimeEpoch"`
@@ -103,12 +103,12 @@ type Response struct {
 		Precipprob     int      `json:"precipprob"`
 		Snow           int      `json:"snow"`
 		Snowdepth      int      `json:"snowdepth"`
-		Preciptype     any      `json:"preciptype"`
+		// Preciptype     any      `json:"preciptype"`
 		Windgust       float64  `json:"windgust"`
 		Windspeed      float64  `json:"windspeed"`
 		Winddir        int      `json:"winddir"`
 		Pressure       int      `json:"pressure"`
-		Visibility     any      `json:"visibility"`
+		// Visibility     any      `json:"visibility"`
 		Cloudcover     float64  `json:"cloudcover"`
 		Solarradiation int      `json:"solarradiation"`
 		Solarenergy    int      `json:"solarenergy"`

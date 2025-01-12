@@ -1,17 +1,22 @@
-# gh-user-activity
+# GitHub User Activity
 
-This is an application to check recent activity of github users from 
-[Roadmap site](https://roadmap.sh). You can find this particular project
-[here](https://roadmap.sh/projects/github-user-activity).
+Project idea link: https://roadmap.sh/projects/github-user-activity
 
-## Build guide
+Created mainly on educational purposes.
 
-1. Clone repository, using ssh, https or zip.
+---
+
+This is an application to check recent activity of github users. It is implemented
+as CLI app. 
+
+## Build Guide
+
+1. Clone repository.
 2. Go to the root folder of the project.
 3. Type `go build` to build the project.
-4. Type `./gh-user-activity 
+4. Type `./gh-user-activity to use the application
 
-## Usage guide
+## Usage
 
 `gh-user-activity` takes 2 arguments separated by whitespace:
 
@@ -23,4 +28,4 @@ Example:
 ```golang
 gh-user-activity krab1o 17
 ```
-will show krab1o`s last 17 events. 
+will show krab1o`s last 17 events.

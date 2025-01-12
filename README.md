@@ -1,9 +1,15 @@
-# Backend-learning
+# Backend Learning
 
 Solutions for backend projects on [roadmap.sh backend projects](https://roadmap.sh/backend/projects)
 
-1. Number [one](https://roadmap.sh/projects/task-tracker)
-2. Number [two](https://roadmap.sh/projects/github-user-activity)
-3. Number [three]()
-4. Number [four]()
-5. Number [five](https://roadmap.sh/projects/unit-converter)
+- [x] Task Tracker
+- [x] GitHub User Activity
+- [ ] Expense Tracker
+- [ ] Number Guessing Game
+- [x] Unit Converter
+- [ ] Personal Blog
+- [x] Weather API
+- [ ] Blogging Platform API
+- [ ] Todo List API
+- [ ] Expense Tracker API
+- [ ] TMDB CLI Tool

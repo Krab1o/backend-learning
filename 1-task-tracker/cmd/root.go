@@ -15,13 +15,13 @@ import (
 var rootCmd = &cobra.Command {
     Use:   "task-tasker",
     Short: "Task-tracker is a cli tool for tracking your tasks",
-    Long:  "Task-tracker is a cli tool for tracking your tasks. some more blah-blah",
     Run: func(cmd *cobra.Command, args []string) {
 		
     },
 }
 
 func init() {
+    rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.AddCommand(add.AddCmd)
 	rootCmd.AddCommand(list.ListCmd)
     rootCmd.AddCommand(mark.MarkCmd)

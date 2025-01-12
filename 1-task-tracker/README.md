@@ -1,20 +1,34 @@
-# Task-tracker
+# Task Tracker
 
-This is my first Golang-project.
+Project idea link: https://roadmap.sh/projects/task-tracker
 
-This is the place where the project was suggested:
-https://roadmap.sh/projects/task-tracker
+Created mainly on educational purposes.
 
-Not sure, if using cobra satisfied the requirement about "not using any 
-framework" but otherwise it would be much dummier application. Using cobra
-I learned about framework itself and structure of golang projects.
+---
 
-By the way, I'm still confused if my structure good enough or I should change
-hierarchy of my files.
+This project allows to track tasks in your CLI.
 
-Anyway, I'm glad to pass the first project!
+## Setting Up
 
-Further plans:
+1. Clone repository
+2. Go to the root folder of the project.
+3. Type `go build` to build the project.
+4. Type `./task-tracker to use the application
 
-1. Add full tag-support
-2. Add time consumed for particular task
+## Usage
+
+After building utility you can use several its commands:
+
+1. `add` — Adds a task
+2. `delete` — Deletes a task
+3. `list` — Shows all tasks
+4. `mark` — Changes your task status
+5. `tag` — Adds tag to your task
+
+Also to get help about particular command or CLI app you can use `help` command 
+in application or `-h` or `--help` flag.
+
+## Further Plans
+
+- [ ] Add full tag-support
+- [ ] Add time consumed for particular task

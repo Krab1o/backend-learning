@@ -3,7 +3,10 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"time"
+	"weather-api/internal/api"
 	"weather-api/internal/data"
+	"weather-api/internal/redis"
 )
 
 func prettifyJson(w http.ResponseWriter, d *data.Response){
@@ -19,6 +22,11 @@ func prettifyJson(w http.ResponseWriter, d *data.Response){
 func WeatherHandler(w http.ResponseWriter, r *http.Request) {
 	city :=	r.URL.Path[len("/weather/"):]
 	
-	data := weatherRequest(city)
+	data, ok := redis.GetWithoutContext(city)
+	if !ok {
+		data = api.WeatherRequest(city)
+		redis.SetWithoutContext(city, data, 1 * time.Minute)
+	}
+	
 	prettifyJson(w, data)
 }
