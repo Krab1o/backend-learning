@@ -1,0 +1,63 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+.login {
+
+}
+
+.body {
+    width: 600px;
+    height: 100vh;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    .body__container {
+        /* text-align: center; */
+        padding: 40px;
+        border: 2px solid black;
+        border-radius: 10px;
+    }
+        .title {
+            font-size: 2em;
+            text-align: center;
+        }
+
+        .input-label {
+            font-size: 1.2em;
+            padding-block: 10px;
+        }
+
+            .form__input {
+                font-size: inherit;
+                height: 30px;
+                width: 250px;
+                border: 2px solid black;
+                border-radius: 10px;
+                margin-bottom: 1vh;
+                padding: 3px 0 3px 6px;
+            }
+        
+        .password-form {
+            margin-bottom: 50px;
+        }
+
+    .btn {
+        margin: 14px 10px;
+        background-color: black;
+        color: white;
+        padding-block: 10px;
+        text-align: center;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .btn:active {
+        background-color: grey;
+        border: 1px solid black;
+    }
