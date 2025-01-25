@@ -1,0 +1,14 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+.articles {
+    width: 50%;
+    margin: 20px auto 0px auto;
+}
+
+    .articles__title {
+        font-size: 2em;
+        padding: 20px;
+    }
