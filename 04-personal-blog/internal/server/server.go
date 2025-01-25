@@ -15,6 +15,7 @@ func Init(r *gin.Engine) {
 	api.PUT("/articles/:id", (&ArticlesHandler{}).UpdateArticle)
 	api.DELETE("/articles/:id", (&ArticlesHandler{}).DeleteArticle)
 	
+	static.GET("/articles/:any", (&ArticlesHandler{}).PageArticleID)
 	static.GET("/home", (&HomeHandler{}).PageHome)
 	static.GET("/login", (&LoginHandler{}).PageLogin)
 	static.GET("/articles", (&ArticlesHandler{}).PageArticles)

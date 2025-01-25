@@ -16,13 +16,34 @@ async function getArticles() {
 
 async function renderArticles(response) {
     let articles = await response.json();
-    let list = document.querySelector(".articles__list")
+    console.log(articles)
+    let list = document.querySelector(".articles__list");
     for (let article of articles) {
-        let newArticle = document.createElement("div");
-        for (let el in article) {
-            
-            newArticle.appendChild(document.createTextNode(article[el]));
-        }
-        list.appendChild(newArticle)
+        list.appendChild(renderArticle(article));
     }
+    
+}
+
+const articleRedirect = (id) => () => {
+    location.href = `http://localhost:8080/articles/${id}`
+}
+
+function renderArticle(article) {
+    let divArticle = document.createElement("div");
+    divArticle.className = "articles__item";
+
+    let divArticleTitle = document.createElement("div")
+    divArticleTitle.className = "lower-title"
+    divArticleTitle.appendChild(document.createTextNode(article.title))
+    divArticle.appendChild(divArticleTitle)
+
+    let divArticleDate = document.createElement("div")
+    divArticleDate.className = "date"
+    let receivedTime = new Date(article.creating_time).toDateString()
+    divArticleDate.appendChild(document.createTextNode(receivedTime))
+    divArticle.appendChild(divArticleDate)
+
+    divArticle.addEventListener("click", articleRedirect(article.id))
+
+    return divArticle;
 }

@@ -7,6 +7,7 @@ import (
 	"personal-blog/internal/db"
 	"personal-blog/internal/types"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -40,6 +41,10 @@ func (a *ArticlesHandler) PageArticles(c *gin.Context) {
 	c.HTML(http.StatusOK, "articles.html", nil)
 }
 
+func (a *ArticlesHandler) PageArticleID(c *gin.Context) {
+	c.HTML(http.StatusOK, "article.html", nil)
+}
+
 func (a *ArticlesHandler) GetArticle(c *gin.Context) {
 	log.Println(c.Request.RequestURI)
 
@@ -61,6 +66,9 @@ func (a *ArticlesHandler) GetArticleByID(c *gin.Context) {
 func (a *ArticlesHandler) CreateArticle(c *gin.Context) {
 	newArticle := types.Article{}
 	json.NewDecoder(c.Request.Body).Decode(&newArticle)
+	newArticle.CreatingTime = time.Now()
+	newArticle.EditingTime = newArticle.CreatingTime
+	log.Println(newArticle)
 	db.CreateArticle(&newArticle)
 
 	c.Status(http.StatusCreated)
@@ -71,6 +79,7 @@ func (a *ArticlesHandler) UpdateArticle(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	newArticle := types.Article{}
 	json.NewDecoder(c.Request.Body).Decode(&newArticle)
+	newArticle.EditingTime = time.Now()
 	ok := db.UpdateArticle(uint(id), &newArticle)
 	if ok {
 		c.Status(http.StatusNoContent)

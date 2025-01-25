@@ -77,7 +77,7 @@ func DeleteArticle(ID uint) bool {
 func CreateArticle(newArticle *types.Article) {
 	articles := openArticles()
 	newArticle.ID = d.ID
-	saveID(&d)	
+	saveID(&d)
 	articles = append(articles, *newArticle)
 	saveArticles(articles)
 }
