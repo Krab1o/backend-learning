@@ -1,9 +1,9 @@
 version: "3.8"
 
 services:
-  database:
+  db:
     image: postgres
-    container_name: my_postgres_db
+    container_name: blog_db
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -13,6 +13,29 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - my_network
+      
+  server:
+    container_name: blog_backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    environment:
+      - AIR_WATCHER_DELAY=1000ms 
+    # command: air 
+    restart: unless-stopped
+    networks:
+      - my_network
 
 volumes:
   postgres_data:
+
+networks:
+  my_network:
