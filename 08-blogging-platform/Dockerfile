@@ -1,12 +1,10 @@
-FROM golang:latest
+FROM golang:1.23-alpine
 
 # Set working directory inside container
 WORKDIR /app
 
 # Copy project files
 COPY . .
-
-WORKDIR /app/cmd
 
 # Install Air for live reloading
 RUN go install github.com/air-verse/air@latest

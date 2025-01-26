@@ -30,7 +30,7 @@ func InitDB() {
 	err = DB.Ping(); if err != nil {
 		log.Printf("DB Ping failed: %v", err)
 	}
-	initStmt, err := os.ReadFile("../init.pgsql")
+	initStmt, err := os.ReadFile("init.pgsql")
 	if (err != nil) {
 		log.Fatalf("Init DB: %v", err)
 	}

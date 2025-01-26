@@ -3,7 +3,7 @@ package main
 import (
 	"blogging-platform/config"
 	"blogging-platform/internal/db"
-	"blogging-platform/internal/routes"
+	routes "blogging-platform/internal/route"
 )
 
 func main() {
