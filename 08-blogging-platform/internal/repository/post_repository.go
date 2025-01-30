@@ -7,37 +7,24 @@ import (
 	"log"
 )
 
-const insertStmt = `INSERT INTO posts (title, content, category, created_at, updated_at) 
-VALUES ($1, $2, $3, $4, $5)`
-
-const selectStmt = `SELECT * FROM posts`
-const selectOneStmt = `SELECT * FROM posts WHERE id = $1`
-
-const deleteStmt = `DELETE FROM posts WHERE id = $1`
-
-const updateStmt = `UPDATE posts SET 
-	title = $2,
-	content = $3,
-	category = $4,
-	created_at = $5,
-	updated_at = $6
-WHERE id = $1
-`
-
 type PostRepositoryPostgres struct{}
 
 type PostRepository interface {
-	CreatePost(newPost *model.Post) error
-	GetPosts() ([]model.Post, error)
-	GetPostByID(id uint) (*model.Post, error)
-	DeletePost(id uint) error
-	UpdatePost(id uint, updatedPost *model.Post) error
+	Add(newPost *model.Post) error
+	Get() ([]model.Post, error)
+	GetOne(id uint) (*model.Post, error)
+	Delete(id uint) error
+	Update(id uint, updatedPost *model.Post) error
 }
 
 func NewPostRepositoryPostgres() PostRepository {
 	return &PostRepositoryPostgres{}
 }
-func (s *PostRepositoryPostgres) CreatePost(newPost *model.Post) error {	
+
+func (s *PostRepositoryPostgres) Add(newPost *model.Post) error {
+	const insertStmt = 
+	`INSERT INTO posts (title, content, category, created_at, updated_at) 
+	VALUES ($1, $2, $3, $4, $5)`	
 	_, err := db.DB.Exec(insertStmt,
 		newPost.Title,
 		newPost.Content,
@@ -53,7 +40,8 @@ func (s *PostRepositoryPostgres) CreatePost(newPost *model.Post) error {
 	return nil
 }
 
-func (s *PostRepositoryPostgres) GetPosts() ([]model.Post, error) {
+func (s *PostRepositoryPostgres) Get() ([]model.Post, error) {
+	const selectStmt = `SELECT * FROM posts`
 	rows, err := db.DB.Query(selectStmt)
 	if err != nil {
 		log.Printf("Store: %v", err)
@@ -82,8 +70,9 @@ func (s *PostRepositoryPostgres) GetPosts() ([]model.Post, error) {
 	return posts, nil
 }
 
-func (s *PostRepositoryPostgres) GetPostByID(id uint) (*model.Post, error) {
+func (s *PostRepositoryPostgres) GetOne(id uint) (*model.Post, error) {
 	post := &model.Post{}
+	const selectOneStmt = `SELECT * FROM posts WHERE id = $1`
 	err := db.DB.QueryRow(selectOneStmt, id).Scan(
 		&post.ID,
 		&post.Title,
@@ -102,7 +91,8 @@ func (s *PostRepositoryPostgres) GetPostByID(id uint) (*model.Post, error) {
 	return post, err
 }
 
-func (s *PostRepositoryPostgres) DeletePost(id uint) error {
+func (s *PostRepositoryPostgres) Delete(id uint) error {
+	const deleteStmt = `DELETE FROM posts WHERE id = $1`
 	_, err := db.DB.Exec(deleteStmt, id)
 	if err != nil {
 		log.Printf("Store: %v", err)
@@ -112,7 +102,15 @@ func (s *PostRepositoryPostgres) DeletePost(id uint) error {
 	return err
 }
 
-func (s *PostRepositoryPostgres) UpdatePost(id uint, updatedPost *model.Post) error {
+func (s *PostRepositoryPostgres) Update(id uint, updatedPost *model.Post) error {
+	const updateStmt = `UPDATE posts SET 
+	title = $2,
+	content = $3,
+	category = $4,
+	created_at = $5,
+	updated_at = $6
+WHERE id = $1
+`
 	_, err := db.DB.Exec(updateStmt, 
 		id,
 		updatedPost.Title,

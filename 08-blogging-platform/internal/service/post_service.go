@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-type BasicService struct{
-	repository repository.PostRepository
+type postService struct{
+	postRepository 	repository.PostRepository
 }
 
 type PostService interface {
@@ -20,48 +20,48 @@ type PostService interface {
 }
 
 func NewPostService() PostService {
-	return &BasicService{
-		repository: repository.NewPostRepositoryPostgres(),
+	return &postService{
+		postRepository: repository.NewPostRepositoryPostgres(),
 	}
 }
 
-func (b *BasicService) CreatePost(newPost *model.Post) error {
+func (b *postService) CreatePost(newPost *model.Post) error {
 	newPost.CreatedAt = time.Now()
 	newPost.UpdatedAt = newPost.CreatedAt
-	err := b.repository.CreatePost(newPost)
+	err := b.postRepository.Add(newPost)
 	if err != nil {
 		log.Printf("Service: failed to create post, %v", err)
 	}
 	return err
 }
 
-func (b *BasicService) GetPosts() ([]model.Post, error) {
-	posts, err := b.repository.GetPosts()
+func (b *postService) GetPosts() ([]model.Post, error) {
+	posts, err := b.postRepository.Get()
 	if err != nil {
 		log.Printf("Service: failed to get posts, %v", err)
 	}
 	return posts, err
 }
 
-func (b *BasicService) GetPostByID(id uint) (*model.Post, error) {
-	post, err := b.repository.GetPostByID(id)
+func (b *postService) GetPostByID(id uint) (*model.Post, error) {
+	post, err := b.postRepository.GetOne(id)
 	if err != nil {
 		log.Printf("Service: failed to get post, %v", err)
 	}
 	return post, err
 }
 
-func (b *BasicService) DeletePost(id uint) error {
-	err := b.repository.DeletePost(id)
+func (b *postService) DeletePost(id uint) error {
+	err := b.postRepository.Delete(id)
 	if err != nil {
 		log.Printf("Service: failed to delete post, %v", err)
 	}
 	return err
 }
 
-func (b *BasicService) UpdatePost(id uint, updatedPost *model.Post) error {
+func (b *postService) UpdatePost(id uint, updatedPost *model.Post) error {
 	updatedPost.UpdatedAt = time.Now()
-	err := b.repository.UpdatePost(id, updatedPost)
+	err := b.postRepository.Update(id, updatedPost)
 	if err != nil {
 		log.Printf("Service: failed to update post, %v", err)
 	}
