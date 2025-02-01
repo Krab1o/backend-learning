@@ -23,7 +23,9 @@ func NewPostHandler() *postHandler{
 // of three layers: handler, service and repository
 
 func (p *postHandler) GetPosts(c *gin.Context) {
-	posts, err := p.service.GetPosts()
+	searchTerm := c.DefaultQuery("term", "")
+	log.Println(searchTerm)
+	posts, err := p.service.GetPosts(searchTerm)
 	if err != nil {
 		log.Printf("Handler get posts: failed to get posts, %v", err)
 		c.Status(http.StatusInternalServerError)

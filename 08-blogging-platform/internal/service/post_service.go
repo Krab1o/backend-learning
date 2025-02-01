@@ -16,7 +16,7 @@ type postService struct{
 
 type PostService interface {
 	CreatePost(newPost *model.Post) error
-	GetPosts() ([]model.Post, error)
+	GetPosts(searchTerm string) ([]model.Post, error)
 	GetPostByID(id uint) (*model.Post, error)
 	GetPostByTag(tag string) ([]model.Post, error)
 	DeletePost(id uint) error
@@ -54,8 +54,16 @@ func (p *postService) CreatePost(newPost *model.Post) error {
 	return err
 }
 
-func (p *postService) GetPosts() ([]model.Post, error) {
-	posts, err := p.postRepository.Get()
+func (p *postService) GetPosts(searchTerm string) ([]model.Post, error) {
+	var posts []model.Post
+	var err error
+	if searchTerm == "" {
+		log.Println("basic search")
+		posts, err = p.postRepository.Get()
+	} else {
+		log.Println("term search")
+		posts, err = p.postRepository.GetByTerm(searchTerm)
+	}
 	if err != nil {
 		log.Printf("Service: failed to get posts, %v", err)
 	}
