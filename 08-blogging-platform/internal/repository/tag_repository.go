@@ -3,106 +3,54 @@ package repository
 import (
 	"blogging-platform/internal/db"
 	"blogging-platform/internal/model"
-	"database/sql"
+	"fmt"
 	"log"
+	"strings"
 )
 
-type TagRepositoryPostgres struct{}
+type tagRepositoryPostgres struct{}
 
 type TagRepository interface {
-	Add(newPost *model.Tag) error
-	Get() ([]model.Tag, error)
-	GetOne(id uint) (*model.Tag, error)
-	Delete(id uint) error
-	Update(id uint, updatedPost *model.Tag) error
+	Add(newTags []model.Tag) ([]uint, error)
 }
 
-func NewTagRepositoryPostgres() TagRepository {
-	return &TagRepositoryPostgres{}
+func NewTagRepository() TagRepository {
+	return &tagRepositoryPostgres{}
 }
 
-func (s *TagRepositoryPostgres) Add(newTag *model.Tag) error {
-	const insertStmt = 
-	`INSERT INTO tags (title) 
-	VALUES ($1)`	
-	_, err := db.DB.Exec(insertStmt,
-		newTag.Title,
-	)
-	if err != nil {
-		log.Printf("Store: %v", err)
-	} else {
-		log.Println("Store: inserted successfully")
+func (s *tagRepositoryPostgres) Add(newTags []model.Tag) ([]uint, error) {
+	valueStrings := make([]string, 0, len(newTags))
+	valueArgs := make([]any, 0, len(newTags))
+
+	for ind, tag := range newTags {
+		valueStrings = append(valueStrings, fmt.Sprintf("($%d)", ind + 1))
+		valueArgs = append(valueArgs, tag.Title)
 	}
-	return nil
-}
-
-func (s *TagRepositoryPostgres) Get() ([]model.Tag, error) {
-	const selectStmt = `SELECT * FROM tags`
-	rows, err := db.DB.Query(selectStmt)
+	log.Println("TAG REPO TAGS: ", newTags)
+	query := fmt.Sprintf(
+		`INSERT INTO tags (tag) 
+		VALUES %s 
+		ON CONFLICT (tag)
+		DO UPDATE SET tag = EXCLUDED.tag
+		RETURNING id
+		`, strings.Join(valueStrings, ","))
+	
+	rows, err := db.DB.Query(query, valueArgs...)
 	if err != nil {
-		log.Printf("Store: %v", err)
-	} else {
-		log.Println("Store: selected successfully")
+		fmt.Println(err)
 	}
-	defer rows.Close()
 
-	var tags []model.Tag
-	var tag model.Tag
-
+	var ids = make([]uint, 0, len(newTags))
+	var id uint
 	for rows.Next() {
-		err := rows.Scan(
-			&tag.ID, 
-			&tag.Title,
-		)
-		if (err != nil) {
-			log.Printf("Store: %v", err)
-		}
-		tags = append(tags, tag)
+		rows.Scan(&id)
+		ids = append(ids, id)
 	}
-	return tags, nil
-}
-
-func (s *TagRepositoryPostgres) GetOne(id uint) (*model.Tag, error) {
-	tag := &model.Tag{}
-	const selectOneStmt = `SELECT * FROM tags WHERE id = $1`
-	err := db.DB.QueryRow(selectOneStmt, id).Scan(
-		&tag.ID,
-		&tag.Title,
-	)
-	if err == sql.ErrNoRows {
-		log.Printf("Store: nothing was found")
-	} else if err != nil{
-		log.Printf("Store: failed to get post, %v", err)
-	} else {
-		log.Println("Store: selected by id successfully")
-	}
-	return tag, err
-}
-
-func (s *TagRepositoryPostgres) Delete(id uint) error {
-	const deleteStmt = `DELETE FROM tags WHERE id = $1`
-	_, err := db.DB.Exec(deleteStmt, id)
+	log.Println("TAG REPO IDs: ", ids)
 	if err != nil {
 		log.Printf("Store: %v", err)
 	} else {
-		log.Println("Store: deleted successfully")
+		log.Println("Store: tags inserted successfully")
 	}
-	return err
-}
-
-func (s *TagRepositoryPostgres) Update(id uint, updatedTag *model.Tag) error {
-	const updateStmt = `UPDATE tags SET 
-	title = $2,
-WHERE id = $1
-`
-	_, err := db.DB.Exec(updateStmt, 
-		id,
-		updatedTag.Title,
-	)
-	if err != nil {
-		log.Printf("Store: %v", err)
-	} else {
-		log.Println("Store: updated successfully")
-	}
-	return err
+	return ids, err
 }

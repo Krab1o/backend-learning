@@ -8,62 +8,108 @@ import (
 )
 
 type postService struct{
-	postRepository 	repository.PostRepository
+	tagService			TagService
+
+	postRepository 		repository.PostRepository
+	postTagRepository	repository.PostTagRepository
 }
 
 type PostService interface {
 	CreatePost(newPost *model.Post) error
 	GetPosts() ([]model.Post, error)
 	GetPostByID(id uint) (*model.Post, error)
+	GetPostByTag(tag string) ([]model.Post, error)
 	DeletePost(id uint) error
-	UpdatePost(id uint, updatedPost *model.Post) error
+	UpdatePost(updatedPost *model.Post) error
 }
 
 func NewPostService() PostService {
 	return &postService{
-		postRepository: repository.NewPostRepositoryPostgres(),
+		tagService: NewTagService(),
+
+		postTagRepository: repository.NewPostTagRepository(),
+		postRepository: repository.NewPostRepository(),
 	}
 }
 
-func (b *postService) CreatePost(newPost *model.Post) error {
+func (p *postService) CreatePost(newPost *model.Post) error {
 	newPost.CreatedAt = time.Now()
 	newPost.UpdatedAt = newPost.CreatedAt
-	err := b.postRepository.Add(newPost)
+
+	tagsID, _ := p.tagService.CreateTags(newPost.Tags)
+	postID, err := p.postRepository.Add(newPost)
+
+	links := make([]model.Link, 0, len(newPost.Tags))
+	for _, id := range tagsID {
+		links = append(links, model.Link{
+			PostID: postID,
+			TagID: id,
+		})
+	}
+	p.postTagRepository.AddLinks(links)
+	
 	if err != nil {
 		log.Printf("Service: failed to create post, %v", err)
 	}
 	return err
 }
 
-func (b *postService) GetPosts() ([]model.Post, error) {
-	posts, err := b.postRepository.Get()
+func (p *postService) GetPosts() ([]model.Post, error) {
+	posts, err := p.postRepository.Get()
 	if err != nil {
 		log.Printf("Service: failed to get posts, %v", err)
 	}
 	return posts, err
 }
 
-func (b *postService) GetPostByID(id uint) (*model.Post, error) {
-	post, err := b.postRepository.GetOne(id)
+func (p *postService) GetPostByID(id uint) (*model.Post, error) {
+	post, err := p.postRepository.GetOne(id)
 	if err != nil {
 		log.Printf("Service: failed to get post, %v", err)
 	}
 	return post, err
 }
 
-func (b *postService) DeletePost(id uint) error {
-	err := b.postRepository.Delete(id)
+func (p *postService) DeletePost(id uint) error {
+	err := p.postRepository.Delete(id)
 	if err != nil {
 		log.Printf("Service: failed to delete post, %v", err)
 	}
 	return err
 }
 
-func (b *postService) UpdatePost(id uint, updatedPost *model.Post) error {
+//TODO: test
+func (p *postService) UpdatePost(updatedPost *model.Post) error {
 	updatedPost.UpdatedAt = time.Now()
-	err := b.postRepository.Update(id, updatedPost)
+	log.Println(updatedPost)
+	err := p.postTagRepository.RemoveLinksByID(updatedPost.ID)
 	if err != nil {
-		log.Printf("Service: failed to update post, %v", err)
+		log.Printf("Service post update: failed to update post (removed links), %v", err)
+	}
+	err = p.postRepository.Update(updatedPost.ID, updatedPost)
+	if err != nil {
+		log.Printf("Service post update: failed to update post (updatedPost), %v", err)
+	}
+
+	tagsID, err := p.tagService.CreateTags(updatedPost.Tags)
+	links := make([]model.Link, 0, len(tagsID))
+	for _, tagID := range tagsID {
+		links = append(links, model.Link{
+			PostID: updatedPost.ID,
+			TagID: tagID, 
+		})
+	}
+	if err != nil {
+		log.Printf("Service post update: failed to update post (new tags), %v", err)
+	}
+	err = p.postTagRepository.AddLinks(links)
+	if err != nil {
+		log.Printf("Service post update: failed to update post (added links), %v", err)
 	}
 	return err
+}
+
+func (p *postService) GetPostByTag(tag string) ([]model.Post, error) {
+	log.Println("not implemented")
+	return []model.Post{}, nil
 }

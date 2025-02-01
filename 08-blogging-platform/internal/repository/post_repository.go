@@ -9,52 +9,88 @@ import (
 
 type PostRepositoryPostgres struct{}
 
+type link struct {
+	postID 	uint
+	tag		string
+}
+
 type PostRepository interface {
-	Add(newPost *model.Post) error
+	Add(newPost *model.Post) (uint, error)
 	Get() ([]model.Post, error)
 	GetOne(id uint) (*model.Post, error)
 	Delete(id uint) error
 	Update(id uint, updatedPost *model.Post) error
 }
 
-func NewPostRepositoryPostgres() PostRepository {
+func NewPostRepository() PostRepository {
 	return &PostRepositoryPostgres{}
 }
 
-func (s *PostRepositoryPostgres) Add(newPost *model.Post) error {
+//TODO: use transactions
+
+func (s *PostRepositoryPostgres) Add(newPost *model.Post) (uint, error) {
 	const insertStmt = 
 	`INSERT INTO posts (title, content, category, created_at, updated_at) 
-	VALUES ($1, $2, $3, $4, $5)`	
-	_, err := db.DB.Exec(insertStmt,
+	VALUES ($1, $2, $3, $4, $5) RETURNING id`	
+	res := db.DB.QueryRow(insertStmt,
 		newPost.Title,
 		newPost.Content,
 		newPost.Category,
 		newPost.CreatedAt,
 		newPost.UpdatedAt,
 	)
+	var id uint
+	err := res.Scan(&id)
+
 	if err != nil {
-		log.Printf("Store: %v", err)
+		log.Printf("Repo posts: %v", err)
 	} else {
-		log.Println("Store: inserted successfully")
+		log.Printf("Repo posts: post #%d inserted successfully", id)
 	}
-	return nil
+	return id, nil
 }
 
 func (s *PostRepositoryPostgres) Get() ([]model.Post, error) {
-	const selectStmt = `SELECT * FROM posts`
-	rows, err := db.DB.Query(selectStmt)
+	const selectIDs = `
+	SELECT p.id, t.tag
+	FROM posts AS p
+	LEFT JOIN posts_tags AS pt ON (p.id = pt.id_post)
+	LEFT JOIN tags AS t ON (pt.id_tag = t.id)
+	`
+	rowsTags, err := db.DB.Query(selectIDs)
 	if err != nil {
-		log.Printf("Store: %v", err)
+		log.Printf("Repo get posts: tags %v", err)
 	} else {
-		log.Println("Store: selected successfully")
+		log.Println("Repo get posts: tags selected successfully")
 	}
-	defer rows.Close()
+	defer rowsTags.Close()
 
+	const selectData = `
+	SELECT p.id, p.title, p.content, p.category, p.created_at, p.updated_at 
+	FROM posts AS p
+	`
+	rowsData, err := db.DB.Query(selectData)
+	if err != nil {
+		log.Printf("Repo get posts: data %v", err)
+	} else {
+		log.Println("Repo get posts: data selected successfully")
+	}
+	defer rowsData.Close()
+
+	links := []link{}
+	l := link{}
+	for rowsTags.Next() {
+		rowsTags.Scan(
+			&l.postID,
+			&l.tag,
+		)
+		links = append(links, l)
+	}
 	var posts []model.Post
 	var post model.Post
 
-	for rows.Next() {
-		err := rows.Scan(
+	for rowsData.Next() {
+		rowsData.Scan(
 			&post.ID, 
 			&post.Title, 
 			&post.Content, 
@@ -62,8 +98,11 @@ func (s *PostRepositoryPostgres) Get() ([]model.Post, error) {
 			&post.CreatedAt,
 			&post.UpdatedAt,
 		)
-		if (err != nil) {
-			log.Printf("Store: %v", err)
+		post.Tags = []string{}
+		for _, l := range links {
+			if post.ID == l.postID {
+				post.Tags = append(post.Tags, l.tag)
+			}
 		}
 		posts = append(posts, post)
 	}
@@ -72,8 +111,21 @@ func (s *PostRepositoryPostgres) Get() ([]model.Post, error) {
 
 func (s *PostRepositoryPostgres) GetOne(id uint) (*model.Post, error) {
 	post := &model.Post{}
+	const selectIDs = `
+	SELECT t.tag
+	FROM posts AS p
+	LEFT JOIN posts_tags AS pt ON (p.id = pt.id_post)
+	LEFT JOIN tags AS t ON (pt.id_tag = t.id)
+	WHERE p.id = $1
+	`
+	rowsTags, err := db.DB.Query(selectIDs, id)
+	if err != nil {
+		log.Printf("Repo get one post: tags %v", err)
+	} else {
+		log.Println("Repo get one post: tags selected successfully")
+	}
 	const selectOneStmt = `SELECT * FROM posts WHERE id = $1`
-	err := db.DB.QueryRow(selectOneStmt, id).Scan(
+	err = db.DB.QueryRow(selectOneStmt, id).Scan(
 		&post.ID,
 		&post.Title,
 		&post.Content,
@@ -82,12 +134,21 @@ func (s *PostRepositoryPostgres) GetOne(id uint) (*model.Post, error) {
 		&post.UpdatedAt,
 	)
 	if err == sql.ErrNoRows {
-		log.Printf("Store: nothing was found")
+		log.Printf("Repo get one post: nothing was found")
 	} else if err != nil{
-		log.Printf("Store: failed to get post, %v", err)
+		log.Printf("Repo get one post: failed to get post, %v", err)
 	} else {
-		log.Println("Store: selected by id successfully")
+		log.Println("Repo get one post: selected by id successfully")
 	}
+	
+	var tag string
+	for rowsTags.Next() {
+		rowsTags.Scan(
+			&tag,
+		)
+		post.Tags = append(post.Tags, tag)
+	}
+	
 	return post, err
 }
 
@@ -97,7 +158,7 @@ func (s *PostRepositoryPostgres) Delete(id uint) error {
 	if err != nil {
 		log.Printf("Store: %v", err)
 	} else {
-		log.Println("Store: deleted successfully")
+		log.Println("Repo delete one post: deleted successfully")
 	}
 	return err
 }
@@ -120,9 +181,9 @@ WHERE id = $1
 		updatedPost.UpdatedAt,
 	)
 	if err != nil {
-		log.Printf("Store: %v", err)
+		log.Printf("Repo upd one post: %v", err)
 	} else {
-		log.Println("Store: updated successfully")
+		log.Println("Repo upd one post: updated successfully")
 	}
 	return err
 }
