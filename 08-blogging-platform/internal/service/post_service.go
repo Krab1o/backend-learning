@@ -86,7 +86,6 @@ func (p *postService) DeletePost(id uint) error {
 	return err
 }
 
-//TODO: test
 func (p *postService) UpdatePost(updatedPost *model.Post) error {
 	updatedPost.UpdatedAt = time.Now()
 	log.Println(updatedPost)

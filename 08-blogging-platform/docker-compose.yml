@@ -28,8 +28,7 @@ services:
     volumes:
       - .:/app
     environment:
-      - AIR_WATCHER_DELAY=1000ms 
-    # command: air 
+      - AIR_WATCHER_DELAY=1000ms
     restart: unless-stopped
     networks:
       - my_network
